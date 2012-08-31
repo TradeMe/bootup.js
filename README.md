@@ -6,7 +6,7 @@ Cache and load static files from local storage. This makes it easier to manage J
 
 Simply instantiate a new BootUp object with an array of files to load.
 
-        new BootUp(<em>files</em>, <em>options</em>);
+        new BootUp(*files*, *options*);
 
 Where:
 
