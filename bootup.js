@@ -322,11 +322,9 @@ var BootUp = function (files, options) {
                 return;
             }
             if (request.readyState == 4 && request.status == 200) {
-                if (request.status == 200) {
-                    processResponse(path, request);
-                } else if (request.status > 400 && request.status < 600) {
-                    processFailure(request, path);
-                }
+                processResponse(path, request);
+            }else if (request.readyState == 4 && request.status > 400 && request.status < 600) {
+                processFailure(request, path);
             }
         };
         request.open("GET", path, true);
