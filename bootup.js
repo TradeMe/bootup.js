@@ -9,6 +9,8 @@
 var BootUp = function (files, options) {
 
     var hasStorage = ("localStorage" in window);
+    var hasXDomainRequest = ('XDomainRequest' in window);
+    var hasXMLHttpRequest = ('XMLHttpRequest' in window);
     var threads = 0;
     var maxThreads = 8;
     var loadCheck = 0;
@@ -71,8 +73,8 @@ var BootUp = function (files, options) {
         if (opts.debug) {
             debugging = opts.debug;
         }
-        if (opts.fresh) {
-            loadFresh = opts.fresh;
+        if (opts.refresh) {
+            loadFresh = opts.refresh;
         }
     }
 
@@ -83,12 +85,16 @@ var BootUp = function (files, options) {
     function init() {
         loadOptions(options);
         fileCount = files.length;
-        try {
-            if (hasStorage && localStorage.getItem("cache")) {
-                storedCache = JSON.parse(localStorage.getItem("cache"));
-            }
-        } catch (e) {
+        if (loadFresh) {
             localStorage.removeItem("cache");
+        } else {
+            try {
+                if (hasStorage && localStorage.getItem("cache")) {
+                    storedCache = JSON.parse(localStorage.getItem("cache"));
+                }
+            } catch (e) {
+                localStorage.removeItem("cache");
+            }
         }
         loadFiles();
     }
@@ -248,10 +254,10 @@ var BootUp = function (files, options) {
     /**
      * If a file has failed to load (i.e. 404 or whatever), then kill the entire process.
      * @private
-     * @param {XMLHTTPRequest} request the XMLHttpRequest object with the response.
      * @param path the file path that has failed.
+     * @param {XMLHTTPRequest} request the XMLHttpRequest object with the response.
      */
-    function processFailure(request, path) {
+    function processFailure(path, request) {
         debug("FAILED TO LOAD A FILE", path);
         if (callbackError) {
             callbackError.call(this);
@@ -265,7 +271,8 @@ var BootUp = function (files, options) {
      * @return a fresh XMLHttpRequest object.
      */
     function getRequest() {
-        return window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP");
+        return hasXDomainRequest ? new XDomainRequest() :
+          (hasXMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP"));
     }
 
     /**
@@ -286,6 +293,37 @@ var BootUp = function (files, options) {
             var item = nextQueue.pop();
             downloadFile(item);
         }
+    }
+
+    /**
+     * Register load callbacks on XMLHttpRequest
+     * @private
+     */
+    function onLoadXMLHttpRequest(path, request) {
+        request.onreadystatechange = function () {
+            // if we have failed, don't bother
+            if (hasFailed) { return; }
+            if (request.readyState == 4 && request.status == 200) {
+                processResponse(path, request);
+            } else if (request.readyState == 4 && request.status > 400 && request.status < 600) {
+                processFailure(path, request);
+            }
+      };
+    }
+
+    /**
+     * Register load callbacks on XDomainRequest
+     * @private
+     */
+    function onLoadXDomainRequest(path, request) {
+        request.onload = function() {
+            if (hasFailed) { return; }
+            processResponse(path, request);
+        };
+        request.onerror = function() {
+            if (hasFailed) { return; }
+            processFailure(path, request);
+        };
     }
 
     /**
@@ -316,17 +354,11 @@ var BootUp = function (files, options) {
 
         var request = getRequest();
         // handle state loading
-        request.onreadystatechange = function () {
-            // if we have failed, don't bother
-            if (hasFailed) {
-                return;
-            }
-            if (request.readyState == 4 && request.status == 200) {
-                processResponse(path, request);
-            }else if (request.readyState == 4 && request.status > 400 && request.status < 600) {
-                processFailure(request, path);
-            }
-        };
+        if (hasXDomainRequest) {
+            onLoadXDomainRequest(path, request);
+        } else {
+            onLoadXMLHttpRequest(path, request);
+        }
         request.open("GET", path, true);
         request.send(null);
     }
