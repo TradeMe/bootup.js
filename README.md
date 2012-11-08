@@ -121,4 +121,4 @@ BootUp isn't just limited to loading Javascript files - it can load any file and
 	}
 
 ## License
-This project is licensed under the LGPL, see the LICENSE.TXT file for more information.
+This project is licensed under the MIT License, see the LICENSE.TXT file for more information.
