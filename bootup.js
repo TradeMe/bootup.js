@@ -9,6 +9,8 @@
 var BootUp = function (files, options) {
 
     var hasStorage = ("localStorage" in window);
+    var hasUrl = ("URL" in window) || ("webkitURL" in window) || ("mozURL" in window)
+        || ("msURL" in window);
     var threads = 0;
     var maxThreads = 8;
     var loadCheck = 0;
@@ -173,7 +175,12 @@ var BootUp = function (files, options) {
         }
         var script = document.createElement("script");
         script.type = "text/javascript";
-        script.text = loaded.data;
+        if(hasUrl) {
+            var URL = window.URL || window.webkitURL || window.mozURL || window.msURL;
+            script.src = URL.createObjectURL(new Blob([loaded.data]));
+        } else {
+            script.text = loaded.data;
+        }
         document.body.appendChild(script);
     }
 
