@@ -142,7 +142,8 @@ var BootUp = function (files, options) {
      */
     function runScripts() {
         for (var i = 0; i < loadedFiles.length; i++) {
-            execute(loadedFiles[i]);
+            executeJS(loadedFiles[i]);
+            executeCSS(loadedFiles[i]);
         }
         if (callbackSuccess) {
             callbackSuccess.call(this);
@@ -167,14 +168,29 @@ var BootUp = function (files, options) {
      * @private
      * @param loaded the loaded data object.
      */
-    function execute(loaded) {
+    function executeJS(loaded) {
         if (loaded.path.indexOf(".js") === -1) {
             return;
         }
         var script = document.createElement("script");
         script.type = "text/javascript";
         script.text = loaded.data;
-        document.body.appendChild(script);
+        document.head.appendChild(script);
+    }
+
+    /**
+     * Injects a CSS file into the page.
+     * @private
+     * @param loaded the loaded data object.
+     */
+    function executeCSS(loaded) {
+        if (loaded.path.indexOf(".css") === -1) {
+            return;
+        }
+        var style = document.createElement("style");
+        style.type = "text/css";
+        style.textContent = loaded.data;
+        document.head.appendChild(style);
     }
 
     /**
