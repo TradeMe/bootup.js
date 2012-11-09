@@ -26,6 +26,8 @@ var BootUp = function (files, options) {
     var callbackError = null;
     var callbackLoaded = null;
 
+    var doc = document;
+
     /**
      * Begins the loading files loop.
      * @private
@@ -141,8 +143,14 @@ var BootUp = function (files, options) {
      * @private
      */
     function runScripts() {
-        for (var i = 0; i < loadedFiles.length; i++) {
-            execute(loadedFiles[i]);
+        var len = loadedFiles.length;
+        if (len) {
+	    var fragment = doc.createDocumentFragment();
+        
+            for (var i = 0; i < len; i++) {
+                fragment.append(execute(loadedFiles[i]));
+            }
+	    doc.body.appendChild(fragment);
         }
         if (callbackSuccess) {
             callbackSuccess.call(this);
@@ -171,10 +179,10 @@ var BootUp = function (files, options) {
         if (loaded.path.indexOf(".js") === -1) {
             return;
         }
-        var script = document.createElement("script");
+        var script = doc.createElement("script");
         script.type = "text/javascript";
         script.text = loaded.data;
-        document.body.appendChild(script);
+        return script;
     }
 
     /**
