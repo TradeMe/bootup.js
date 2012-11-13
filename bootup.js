@@ -163,18 +163,30 @@ var BootUp = function (files, options) {
     }
 
     /**
-     * Injects a JS file into the page.
+     * Injects a JS or CSS file into the page.
      * @private
      * @param loaded the loaded data object.
      */
     function execute(loaded) {
-        if (loaded.path.indexOf(".js") === -1) {
-            return;
-        }
-        var script = document.createElement("script");
-        script.type = "text/javascript";
-        script.text = loaded.data;
-        document.body.appendChild(script);
+    	// extension of the file
+		var ext = (loaded.path.split('.')[1] === "min" || loaded.path.split('.')[1] === "pack")? loaded.path.split('.')[2] : loaded.path.split('.')[1];
+		debug( "Extension of the File", ext);
+		switch( ext ) {
+			case "js":
+					var script = document.createElement("script");
+					script.type = "text/javascript";
+					script.text = loaded.data;
+					document.head.appendChild(script);
+				break;
+			case "css":
+					var style = document.createElement("style");
+					style.type = "text/css";
+					style.textContent = loaded.data;
+					document.head.appendChild(style);
+				break;
+			default:
+				return;
+		}
     }
 
     /**
