@@ -170,7 +170,7 @@ var BootUp = function (files, options) {
     function execute(loaded) {
     	// extension of the file
 		var ext = (loaded.path.split('.')[1] === "min" || loaded.path.split('.')[1] === "pack")? loaded.path.split('.')[2] : loaded.path.split('.')[1];
-		console.log(ext)
+		debug( "Extension of the File", ext);
 		switch( ext ) {
 			case "js":
 					var script = document.createElement("script");
