@@ -19,7 +19,7 @@ Where:
 A callback for when all files have loaded successfully.
 
 #### error: function(Object BootUp)
-A callback for when at least one file has failed. 
+A callback for when at least one file has failed.
 
 #### loaded: function(Object BootUp, Number downloadedCount, Number fileCount, String path, String data)
 This callback will fired after a file has successfully downloaded.
@@ -48,9 +48,9 @@ Get the contents of the file with the specified file name.
 
 The simplest way to use BootUp is to just specify an array of files to download.
 
-	new BootUp(["jquery.js", "backbone.js", "site.js"]);
+	new BootUp(["style.css", jquery.js", "backbone.js", "site.js"]);
 
-This will load in jQuery, Backbone and your site code (in the order that they are specified) and load them into `localStorage` (if available). On the next visit, it will just load them from `localStorage` directly.
+This will load in your site CSS, jQuery, Backbone and your site code (in the order that they are specified) and load them into `localStorage` (if available). On the next visit, it will just load them from `localStorage` directly.
 
 ### Callbacks
 
@@ -59,7 +59,7 @@ There are three callbacks that you can use and are specified in the `options` ob
 `success` is called when all the files specified in the array have been downloaded. It works similar to the `window.onload` event handler.
 
 	new BootUp(
-		["jquery.js", "backbone.js", "site.js"],
+		["style.css", "jquery.js", "backbone.js", "site.js"],
 		{
 			success: function() {
 				init();
@@ -71,7 +71,7 @@ There are three callbacks that you can use and are specified in the `options` ob
 `error` is called if there is an issue downloading any of the files. Note, this is not called if `localStorage` is unavailable, or has become corrupt (these are handled silently by BootUp and in most cases would act like nothing happened).
 
 	new BootUp(
-		["jquery.js", "backbone.js", "site.js"],
+		["style.css", "jquery.js", "backbone.js", "site.js"],
 		{
 			error: function() {
 				alert("There was an error loading the files. Please try again later.");
@@ -84,7 +84,7 @@ There are three callbacks that you can use and are specified in the `options` ob
 	<div id="Progress"></div>
 	<script>
 		new BootUp(
-			["jquery.js", "backbone.js", "site.js"],
+			["style.css", "jquery.js", "backbone.js", "site.js"],
 			{
 				loaded: function(obj, current, maximum) {
 					document.getElementById("Progress").innerText = current + " of " + maximum + " downloaded...";
