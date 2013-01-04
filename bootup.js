@@ -83,6 +83,9 @@ var BootUp = function (files, options) {
     function init() {
         loadOptions(options);
         fileCount = files.length;
+        if (loadFresh && hasStorage && localStorage.getItem("cache")) {
+            localStorage.removeItem("cache");
+        }
         try {
             if (hasStorage && localStorage.getItem("cache")) {
                 storedCache = JSON.parse(localStorage.getItem("cache"));
@@ -163,7 +166,7 @@ var BootUp = function (files, options) {
     }
 
     /**
-     * Injects a JS or CSS file into the page.
+     * Injects a JS file into the page.
      * @private
      * @param loaded the loaded data object.
      */
