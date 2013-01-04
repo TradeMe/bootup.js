@@ -166,7 +166,7 @@ var BootUp = function (files, options) {
     }
 
     /**
-     * Injects a JS file into the page.
+     * Injects a JS or CSS file into the page.
      * @private
      * @param loaded the loaded data object.
      */
