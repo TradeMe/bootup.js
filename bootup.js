@@ -83,6 +83,9 @@ var BootUp = function (files, options) {
     function init() {
         loadOptions(options);
         fileCount = files.length;
+        if (loadFresh && hasStorage && localStorage.getItem("cache")) {
+            localStorage.removeItem("cache");
+        }
         try {
             if (hasStorage && localStorage.getItem("cache")) {
                 storedCache = JSON.parse(localStorage.getItem("cache"));
@@ -163,18 +166,39 @@ var BootUp = function (files, options) {
     }
 
     /**
-     * Injects a JS file into the page.
+     * Injects a JS or CSS file into the page.
      * @private
      * @param loaded the loaded data object.
      */
     function execute(loaded) {
-        if (loaded.path.indexOf(".js") === -1) {
-            return;
+        var types = "css|js",
+            re = new RegExp("^"+ types, "i"),
+            extension = loaded.path.split("."),
+            filetype;
+
+        extension = extension[extension.length - 1];
+        filetype = re.exec(extension)[0];
+
+        switch (filetype) {
+
+            case "js":
+
+                var script = document.createElement("script");
+                script.type = "text/javascript";
+                script.text = loaded.data;
+                document.body.appendChild(script);
+
+                break;
+
+            case "css":
+
+                var style = document.createElement("style");
+                style.type = "text/css";
+                style.innerHTML = loaded.data;
+                document.head.appendChild(style);
+
+                break;
         }
-        var script = document.createElement("script");
-        script.type = "text/javascript";
-        script.text = loaded.data;
-        document.body.appendChild(script);
     }
 
     /**
